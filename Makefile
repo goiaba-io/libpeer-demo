@@ -21,6 +21,9 @@ monitor:
 menuconfig:
 	$(IDF_PY) menuconfig
 
+reconfigure:
+	$(IDF_PY) reconfigure
+
 defconfig:
 	$(IDF_PY) defconfig
 

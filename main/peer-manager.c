@@ -185,9 +185,10 @@ void peer_manager_init(const char *ssid, const char *password) {
 
     peer_connection_oniceconnectionstatechange(g_pc,
         oniceconnectionstatechange);
+    peer_connection_ondatachannel(g_pc, onmessage, onopen, NULL);
     peer_connection_onicecandidate(g_pc, on_local_sdp);
 
-    peer_connection_ondatachannel(g_pc, onmessage, onopen, NULL);
+    vTaskDelay(pdMS_TO_TICKS(5000));
 
     ESP_LOGI(TAG, "Peer manager initialized");
 }
