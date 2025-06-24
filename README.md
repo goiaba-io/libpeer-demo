@@ -57,15 +57,17 @@ By layering your application this way—Wi-Fi management separate from signaling
 
 ```text
 .
-├── CMakeLists.txt           ← Top-level CMake project file
-├── sdkconfig.defaults       ← Default CONFIG_WIFI_CONNECT_* & SIGNALING_* values
-├── README.md                ← This file
-├── components/
-│   └── libpeer/             ← WebRTC engine component (from Git)
-└── main/
-    ├── main.c               ← app_main() calling wifi-init() and peer_manager_init()
-    ├── wifi-manager.c       ← Wi-Fi helper
-    └── peer-manager.c       ← PeerConnection manager
+├──libpeer-demo
+│   ├── CMakeLists.txt        ← Top-level CMake project file
+│   ├── sdkconfig.defaults    ← Default CONFIG_WIFI_CONNECT_* & SIGNALING_* values
+│   ├── README.md             ← This file
+│   ├── main/
+│      ├── includes/
+│      ├── main.c             ← app_main() calling wifi_init() and peer_manager_init()
+│      ├── wifi-manager.c     ← Wi-Fi manager
+│      └── peer-manager.c     ← PeerConnection manager
+└── components/
+   └── libpeer/               ← WebRTC engine component (from Git)
 ```
 
 ## Configuration
