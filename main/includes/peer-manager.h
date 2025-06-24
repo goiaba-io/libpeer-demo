@@ -10,6 +10,9 @@ extern "C" {
 #endif
 
 void peer_manager_init();
+void peer_manager_register_connection_task(void);
+void peer_manager_register_signaling_task(void);
+void peer_manager_register_send_task(void);
 
 #ifdef __cplusplus
 }

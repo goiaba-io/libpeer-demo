@@ -1,8 +1,5 @@
-idf_component_register(SRCS
-  "main.c"
-  "peer-manager.c"
-  "wifi-manager.c"
-  INCLUDE_DIRS "includes"
+idf_component_register(SRCS "main.c" "peer-manager.c" "wifi-manager.c"
+  INCLUDE_DIRS "." "includes"
   REQUIRES libpeer esp_wifi nvs_flash
 )
 

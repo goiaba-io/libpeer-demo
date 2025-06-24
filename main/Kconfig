@@ -1,0 +1,32 @@
+menu "Wi-Fi credentials"
+
+config WIFI_CONNECT_SSID
+    string "Wi-Fi SSID"
+    default "your_ssid"
+    help
+      Your Wi-Fi network's SSID.
+
+config WIFI_CONNECT_PASSWORD
+    string "Wi-Fi Password"
+    default "your_password"
+    help
+      Your Wi-Fi network's password.
+
+endmenu
+
+
+menu "Peer-manager configuration"
+
+config SIGNALING_URL
+    string "Signaling server URL"
+    default "mqtts://libpeer.com/public/striped-lazy-eagle"
+    help
+      The full URL your ESP32 will use to connect for WebRTC signaling.
+
+config SIGNALING_TOKEN
+    string "Signaling auth token (optional)"
+    default ""
+    help
+      If your signaling endpoint requires a token, set it here.
+
+endmenu

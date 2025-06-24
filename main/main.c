@@ -5,12 +5,13 @@
 #include "wifi-manager.h"
 
 static const char *TAG = "core";
-static const char *SSID = "your_ssid";
-static const char *PASSWORD = "your_password";
 
 void app_main(void) {
-    wifi_init_sta(SSID, PASSWORD);
     ESP_LOGI(TAG, "Initializing libpeer...");
+    wifi_init(CONFIG_WIFI_CONNECT_SSID, CONFIG_WIFI_CONNECT_PASSWORD);
     peer_manager_init();
+    peer_manager_register_connection_task();
+    peer_manager_register_signaling_task();
+    peer_manager_register_send_task();
     vTaskDelete(NULL);
 }

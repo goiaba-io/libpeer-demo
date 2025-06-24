@@ -14,8 +14,6 @@
 
 static const char *TAG = "peer-manager";
 
-static const char *CONFIG_SIGNALING_URL =
-    "mqtts://libpeer.com/public/striped-lazy-eagle";
 extern char *peer_connection_get_local_sdp(PeerConnection *pc);
 
 SemaphoreHandle_t xSemaphore = NULL;
@@ -49,7 +47,7 @@ static void onopen(void *userdata) {
 
 static void signaling_task(void *arg) {
     ESP_LOGI(TAG, "Signaling task started");
-    peer_signaling_connect(CONFIG_SIGNALING_URL, "", g_pc);
+    peer_signaling_connect(CONFIG_SIGNALING_URL, CONFIG_SIGNALING_TOKEN, g_pc);
     for (;;) {
         peer_signaling_loop(g_pc);
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -187,19 +185,58 @@ void peer_manager_init(const char *ssid, const char *password) {
 
     peer_connection_oniceconnectionstatechange(g_pc,
         oniceconnectionstatechange);
+    peer_connection_onicecandidate(g_pc, on_local_sdp);
+
     peer_connection_ondatachannel(g_pc, onmessage, onopen, NULL);
 
-    peer_connection_onicecandidate(g_pc, on_local_sdp);
+    ESP_LOGI(TAG, "Peer manager initialized");
+}
+
+void peer_manager_register_connection_task(void) {
+    if (xSemaphore == NULL) {
+        ESP_LOGE(TAG, "Semaphore not initialized");
+        return;
+    }
+
+    if (g_pc == NULL) {
+        ESP_LOGE(TAG, "PeerConnection not initialized");
+        return;
+    }
 
     if (xTaskCreate(connection_task, "conn", 8 * 1024, NULL, 5, NULL) !=
         pdPASS) {
         ESP_LOGW(TAG, "Failed to create connection task");
     }
+}
+
+void peer_manager_register_signaling_task(void) {
+    if (xSemaphore == NULL) {
+        ESP_LOGE(TAG, "Semaphore not initialized");
+        return;
+    }
+
+    if (g_pc == NULL) {
+        ESP_LOGE(TAG, "PeerConnection not initialized");
+        return;
+    }
+
     if (xTaskCreate(signaling_task, "sig", 8 * 1024, NULL, 5, NULL) != pdPASS) {
         ESP_LOGW(TAG, "Failed to create signaling task");
     }
+}
+
+void peer_manager_register_send_task(void) {
+    if (xSemaphore == NULL) {
+        ESP_LOGE(TAG, "Semaphore not initialized");
+        return;
+    }
+
+    if (g_pc == NULL) {
+        ESP_LOGE(TAG, "PeerConnection not initialized");
+        return;
+    }
+
     if (xTaskCreate(send_task, "send", 4 * 1024, NULL, 5, NULL) != pdPASS) {
         ESP_LOGW(TAG, "Failed to create send task");
     }
-    ESP_LOGI(TAG, "Peer manager initialized");
 }
