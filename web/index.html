@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ESP32↔Browser DataChannel Test</title>
+  <style>
+    body { font-family: sans-serif; margin: 1rem; }
+    textarea { width: 100%; box-sizing: border-box; }
+    #messages { background: #f7f7f7; padding: 0.5rem; height: 150px; overflow-y: auto; border: 1px solid #ccc; }
+    button { margin-top: 0.5rem; padding: 0.5rem 1rem; }
+  </style>
+</head>
+<body>
+  <h1>ESP32 DataChannel on localhost</h1>
+
+  <label for="offer">1) Paste ESP32 SDP Offer (full text):</label><br>
+  <textarea id="offer" rows="8" placeholder="v=0…"></textarea>
+
+  <button id="connect">2) Connect & Generate Answer</button>
+
+  <h2>Browser SDP Answer:</h2>
+  <textarea id="answer" rows="8" readonly placeholder="(will appear here)"></textarea>
+
+  <h2>Incoming Messages:</h2>
+  <pre id="messages"></pre>
+
+  <script>
+    (async () => {
+      const offerEl   = document.getElementById('offer');
+      const answerEl  = document.getElementById('answer');
+      const connectEl = document.getElementById('connect');
+      const msgEl     = document.getElementById('messages');
+
+      const pc = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+      });
+
+      pc.ondatachannel = ev => {
+        const ch = ev.channel;
+        ch.onopen = () => console.log('✅ DataChannel open');
+        ch.onmessage = e => {
+          console.log('◀️', e.data);
+          msgEl.textContent += e.data + '\n';
+        };
+      };
+
+      connectEl.onclick = async () => {
+        const lines = offerEl.value.trim().split(/\r?\n/);
+        const sdpLines  = lines.filter(l => !l.startsWith('a=candidate:'));
+        const candLines = lines.filter(l =>  l.startsWith('a=candidate:'));
+
+        // 1) Set the offer SDP (no candidates)
+        await pc.setRemoteDescription({
+          type: 'offer',
+          sdp: sdpLines.join('\r\n') + '\r\n'
+        });
+
+        // 2) Add candidates with sdpMid and sdpMLineIndex
+        for (const c of candLines) {
+          await pc.addIceCandidate({
+            candidate: c,
+            sdpMid: 'datachannel',  // matches a=mid:datachannel
+            sdpMLineIndex: 0        // first m= section
+          });
+        }
+
+        // 3) Create and send back the answer
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        answerEl.value = pc.localDescription.sdp;
+      };
+
+      pc.onicecandidate = ev => {
+        if (ev.candidate) {
+          console.log('Local ICE candidate:', ev.candidate.candidate);
+        }
+      };
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+dependencies:
+  sepfy/libpeer:
+    path: ../../components/libpeer
+    version: ">=0.0.2"
+  idf:
+    version: ">=4.1.0"
