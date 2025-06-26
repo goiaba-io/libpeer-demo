@@ -81,7 +81,7 @@ Run `idf.py menuconfig` and set:
 
 - **Signaling server URL / token**
   **Component config → Peer-manager configuration**
-  - `CONFIG_SIGNALING_URL` — full URL of your signaling endpoint (e.g. `https://sepfy.github.io/libpeer/?id=your-room-id`)
+  - `CONFIG_SIGNALING_URL` — full URL of your signaling endpoint (e.g. `https://goiaba-io.github.io/goiaba/peer-demo/?id=your-room-id`)
   - `CONFIG_SIGNALING_TOKEN` — optional auth token
 
 - **DTLS-SRTP support**
@@ -111,6 +111,14 @@ idf.py build
 idf.py flash monitor
 ```
 
+To establish a peer-to-peer connection, open the demo page at
+
+```
+https://goiaba-io.github.io/goiaba/peer-demo/
+```
+
+and let it generate (or manually enter) a unique device ID. Once you click “Connect,” the full URL—including your chosen ID will appear (for example, `mqtts://libpeer.com/public/striped-lazy-eagle`). Past this SIGNALING_URL in Goiaba `libpeer-demo` example.
+
 After boot, you’ll see:
 
 ```
@@ -118,7 +126,7 @@ I (###) peer-manager: Datachannel opened
 I (###) peer-manager: Starting send_task – sending "pong" every second
 ```
 
-On your browser (via manual signaling or the libpeer demo page), you should then receive `"<<< pong"` messages every second.
+On your browser (via manual signaling or the libpeer demo page), you should then receive `"<<< pong"` messages every second. And you can send any string to the device.
 
 Press **Ctrl+]** to exit the serial monitor.
 
